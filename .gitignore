@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+
+# Self-signed TLS cert/key - regenerated per-machine, key must never be public
+certs/
+
+# User's shared files - personal content, not part of the app
+shared/*
+!shared/.gitkeep
+
+# Generated at runtime, tied to a specific machine's IP
+static/qr.png
