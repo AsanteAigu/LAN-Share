@@ -10,6 +10,7 @@ import argparse
 import datetime
 import ipaddress
 import socket
+import sys
 from pathlib import Path
 
 from cryptography import x509
@@ -21,9 +22,17 @@ from werkzeug.utils import secure_filename
 import psutil
 import qrcode
 
-BASE_DIR = Path(__file__).resolve().parent
+FROZEN = getattr(sys, "frozen", False)
+if FROZEN:
+    # PyInstaller exe: bundled templates/static are unpacked to a temp dir,
+    # while user data (shared files, certs) lives next to the exe itself.
+    BASE_DIR = Path(sys.executable).resolve().parent
+    BUNDLE_DIR = Path(sys._MEIPASS)
+else:
+    BASE_DIR = BUNDLE_DIR = Path(__file__).resolve().parent
 SHARED_DIR = BASE_DIR / "shared"
-STATIC_DIR = BASE_DIR / "static"
+STATIC_DIR = BUNDLE_DIR / "static"
+TEMPLATE_DIR = BUNDLE_DIR / "templates"
 QR_PATH = STATIC_DIR / "qr.png"
 CERT_DIR = BASE_DIR / "certs"
 CERT_PATH = CERT_DIR / "cert.pem"
@@ -32,7 +41,7 @@ KEY_PATH = CERT_DIR / "key.pem"
 DEFAULT_PORT = 5000
 DEFAULT_MAX_UPLOAD_MB = 500
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=str(TEMPLATE_DIR), static_folder=str(STATIC_DIR))
 
 SHARED_DIR.mkdir(exist_ok=True)
 STATIC_DIR.mkdir(exist_ok=True)
@@ -340,4 +349,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    except Exception as exc:
+        if not FROZEN:
+            raise
+        # Double-clicked exe: keep the console open so the error is readable.
+        print(f"\nERROR: {exc}")
+        input("Press Enter to close...")

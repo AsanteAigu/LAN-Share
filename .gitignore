@@ -11,3 +11,6 @@ shared/*
 
 # Generated at runtime, tied to a specific machine's IP
 static/qr.png
+
+# PyInstaller build intermediates
+build/

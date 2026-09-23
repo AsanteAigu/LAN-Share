@@ -41,6 +41,17 @@ devices, and what `server.py` will print automatically on startup.
 
 ## 3. Install and run
 
+### Easiest: the exe (no Python needed)
+
+Download `release/LAN-Share.exe` from this repo, put it in any folder,
+and double-click it. It creates `shared/` and `certs/` next to itself.
+When the Windows Firewall prompt appears, allow **Private networks**.
+Flags work the same from a terminal: `LAN-Share.exe --port 8080`.
+
+To rebuild the exe yourself, run `build.bat` (inside the venv below).
+
+### From source
+
 ```
 python -m venv venv
 venv\Scripts\activate
